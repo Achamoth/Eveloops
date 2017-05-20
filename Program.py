@@ -317,6 +317,13 @@ def readRules(filename):
             #Store state-transition rule in list
             index = (int(states[0])*pow(9,4)) + (int(states[1])*pow(9,3)) + (int(states[2])*pow(9,2)) + (int(states[3])*9) + int(states[4])
             rules[index] = int(image)
+            #Store all rotationally symmetric rules in list
+            index = (int(states[0])*pow(9,4)) + (int(states[2])*pow(9,3)) + (int(states[3])*pow(9,2)) + (int(states[4])*9) + int(states[1])
+            rules[index] = int(image)
+            index = (int(states[0])*pow(9,4)) + (int(states[3])*pow(9,3)) + (int(states[4])*pow(9,2)) + (int(states[1])*9) + int(states[2])
+            rules[index] = int(image)
+            index = (int(states[0])*pow(9,4)) + (int(states[4])*pow(9,3)) + (int(states[1])*pow(9,2)) + (int(states[2])*9) + int(states[3])
+            rules[index] = int(image)
     #Return list of rules
     return rules
 
@@ -324,6 +331,9 @@ def main():
     rules = readRules('StateTransitionRules.txt')
     ev = Eveloop(150,13,2)
     ev.setRules(rules)
+    for i in range(5000):
+        print(i)
+        ev.tick()
     viewer = EViewer(ev)
     viewer.animate(100)
 
