@@ -3,17 +3,24 @@ import sys
 import numpy
 
 class Eveloop(object):
+    """Represents an Eveloop CA"""
 
     def __init__(self, n=200, species=13, var=2):
+        """Sets up Eveloop CA with specified grid size (nxn), and starting configuration (species and variant)"""
+        #Set up grid
         self.lastGrid = [[0 for x in range(n)] for y in range(n)]
         self.lastGrid = numpy.array(self.lastGrid)
         self.curGrid = [[0 for x in range(n)] for y in range(n)]
         self.curGrid = numpy.array(self.curGrid)
+
+        #Set up starting loop
         messenger = self.setGridAndBox()
         self.setSpecies(species, var, messenger)
         self.n = n
 
     def setSpecies(self, species, var, messenger):
+        """Creates the starting loop, given the desired species and variant"""
+
         #Get location of messenger cell
         y, x = messenger
 
@@ -32,7 +39,7 @@ class Eveloop(object):
             #Moving up
             if(direction == 0):
                 self.curGrid[y][x] = 0 #Trailing backgrund cell
-                if(self.curGrid[y+1][x] == 2):
+                if(self.curGrid[y+1][x] == 2): #Hit the top; need to start moving left
                     direction = 1
                     x = x-1
                     self.curGrid[y][x] = 7 #White gene cell
@@ -40,10 +47,10 @@ class Eveloop(object):
                 else:
                     y = y+1
                     self.curGrid[y][x] = 7 #White gene cell
-                    if(self.curGrid[y+1][x] == 2):
+                    if(self.curGrid[y+1][x] == 2): #Hit the top; need to start moving left
                         direction = 1
                         x = x-2
-                    elif(self.curGrid[y+2][x] == 2):
+                    elif(self.curGrid[y+2][x] == 2): #Hit the top; need to start moving left
                         y = y+1
                         x = x-1
                         direction = 1
@@ -54,7 +61,7 @@ class Eveloop(object):
             elif(direction == 1):
                 #Moving left
                 self.curGrid[y][x] = 0 #Trailing background cell
-                if(self.curGrid[y][x-1] == 2):
+                if(self.curGrid[y][x-1] == 2): #Hit the side sheath; need to start moving down
                     direction = 2
                     y = y+1
                     self.curGrid[y][x] = 7 #White gene cell
@@ -62,10 +69,10 @@ class Eveloop(object):
                 else:
                     x = x-1
                     self.curGrid[y][x] = 7 #White gene cell
-                    if(self.curGrid[y][x-1] == 2):
+                    if(self.curGrid[y][x-1] == 2): #Hit the side sheath; need to start moving down
                         direction = 2
                         y = y+2
-                    elif(self.curGrid[y][x-2] == 2):
+                    elif(self.curGrid[y][x-2] == 2): #Hit the side sheath; need to start moving down
                         x = x-1
                         y = y+1
                         direction = 2
@@ -73,7 +80,7 @@ class Eveloop(object):
                         x = x-2
 
             #Moving Down
-            #TODO: Don't need to do any checks here, as long as the species isn't larger than 13/14
+            #TODO: Don't need to do any checks here, as long as the species isn't larger than 13
             elif(direction == 2):
                 self.curGrid[y][x] = 0 #Trailing background cell
                 y = y-1
@@ -92,7 +99,7 @@ class Eveloop(object):
             #Moving left
             if(direction == 0):
                 self.curGrid[y][x] = 7 #White gene cell
-                if(self.curGrid[y][x-1] == 2):
+                if(self.curGrid[y][x-1] == 2): #Hit the side sheath; need to start moving up
                     y = y+1
                     self.curGrid[y][x] = 0 #Trailing background cell
                     y = y+2
@@ -100,10 +107,10 @@ class Eveloop(object):
                 else:
                     x = x-1
                     self.curGrid[y][x] = 0 #Trailing background cell
-                    if(self.curGrid[y][x-1] == 2):
+                    if(self.curGrid[y][x-1] == 2): #Hit the side sheath; need to start moving up
                         direction = 1
                         y = y+2
-                    elif(self.curGrid[y][x-2] == 2):
+                    elif(self.curGrid[y][x-2] == 2): #Hit the side sheath; need to start moving up
                         direction = 1
                         x = x-1
                         y = y+1
@@ -113,7 +120,7 @@ class Eveloop(object):
             #Moving up
             elif(direction == 1):
                 self.curGrid[y][x] = 7 #White gene cell
-                if(self.curGrid[y+1][x] == 2):
+                if(self.curGrid[y+1][x] == 2): #Hit the top; need to start moving right
                     x = x+1
                     self.curGrid[y][x] = 0 #Trailing background cell
                     x = x+2
@@ -121,10 +128,10 @@ class Eveloop(object):
                 else:
                     y = y+1
                     self.curGrid[y][x] = 0 #Trailing background cell
-                    if(self.curGrid[y+1][x] == 2):
+                    if(self.curGrid[y+1][x] == 2): #Hit the top; need to start moving right
                         direction = 2
                         x = x+2
-                    elif(self.curGrid[y+2][x] == 2):
+                    elif(self.curGrid[y+2][x] == 2): #Hit the top; need to start moving right
                         direction = 2
                         y = y+1
                         x = x+1
@@ -140,6 +147,9 @@ class Eveloop(object):
                 x = x+2
 
     def setGridAndBox(self):
+        """Sets the grid up, so that a species can be configured"""
+        """Places all background cells and sets up empty loop (sheath cells, core conducting cells and messenger cell)"""
+
         #First, set all cells to background state
         for y in range(0,len(self.curGrid)):
             for x in range(0,len(self.curGrid[y])):
@@ -181,28 +191,35 @@ class Eveloop(object):
         return messenger
 
     def setRules(self, rules):
+        """Given a list of state transition rules, sets those rules as this Eveloop's active CA transition rules (for use in tick())"""
         self.rules = rules
 
     def getState(self, x, y):
-        #Given an (x, y) tuple, get the state of the cell at that position in the last timestep's grid
+        """Given an (x, y) tuple, get the stae of the cell at that position in the lat timestep's grid"""
         xPos = x
         yPos = y
+        rows = len(self.lastGrid)
+        columns = len(self.lastGrid[0])
+        #Perform boundary checks (to wrap around edges of grid if necessary)
         if(yPos == -1):
-            yPos = len(self.lastGrid)-1
-        elif(yPos == len(self.lastGrid)):
+            yPos = rows-1
+        elif(yPos == rows):
             yPos = 0
         if(xPos == -1):
-            xPos = len(self.lastGrid[yPos])-1
-        elif(xPos == len(self.lastGrid[yPos])):
+            xPos = columns-1
+        elif(xPos == columns):
             xPos = 0
+        #Retrieve and return desired cell's state
         return self.lastGrid[yPos][xPos]
 
     def getNextState(self, c, t, r, b, l):
-        #Given the states of a neighbourhood, get the next state for the center
+        """Given the states of a Von Neumann neighbourhood, return the next state for the center, according to the CA's transition rules"""
+
         #First, check if we have a defined state-transition in 'rules' for the states of the neihbourhood
         index = (c*pow(9,4)) + (t*pow(9,3)) + (r*pow(9,2)) + (b*pow(9,1)) + (l)
         if(self.rules[index] != -1):
             return self.rules[index]
+
         else:
             #Transition not defined manually in table. Find next state according to the following rules
             if(c == 8):
@@ -236,14 +253,20 @@ class Eveloop(object):
                     return 8
 
     def getGrid(self):
+        """Return this CA's current grid"""
         return self.curGrid
 
     def tick(self):
-        self.lastGrid = copy.deepcopy(self.curGrid)
+        """Move to the next timestep according to the state-transition rules of the CA"""
+        #Copy the current grid into lastGrid
+        self.lastGrid = numpy.empty_like (self.curGrid)
+        self.lastGrid[:] = self.curGrid
         #Loop over all cells
-        for y in range(0,len(self.lastGrid)):
-            for x in range(0,len(self.lastGrid[y])):
-                #Check states of current cell's neighbours, and its own state
+        rows = len(self.lastGrid)
+        columns = len(self.lastGrid[0])
+        for y in range(0,rows):
+            for x in range(0,columns):
+                #Check states of current cell's immediate neighbours, and its own state
                 c = self.getState(x, y)
                 t = self.getState(x, y+1)
                 r = self.getState(x+1, y)

@@ -5,6 +5,8 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as pyplot
 
+"""Much of the code for this class has been adapted/borrowed from 'Think Complexity: Chapter 7', by Allen B. Downey"""
+
 class EViewer(object):
     """Generates an animated view of the grid."""
     def __init__(self, ev, cmap=matplotlib.cm.Paired):
@@ -30,7 +32,6 @@ class EViewer(object):
 
     def animate(self, steps=10):
         """Creates the GUI and then invokes animate_callback.
-
         Generates an animation with the given number of steps.
         """
         self.steps = steps
