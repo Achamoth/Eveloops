@@ -21,9 +21,13 @@ def main():
     time = int(raw_input('How many timesteps do you want to run the CA for? '))
 
     #Run CA for specified number of timesteps
-    for i in range(time):
-        print('Timestep: ' + str(i))
-        ev.tick()
+    for j in range(10):
+        for i in range(time):
+            print('Timestep: ' + str(i))
+            ev.tick()
+        #Save Eveloop config to file
+        outName = 'Eveloop ' + str(species) + ' ' + str(var) + ' ' + str(j) + '.txt'
+        FileOps.writeEveloop(outName, ev)
 
     #Set up viewer for animation
     viewer = EVAnimate.EViewer(ev)
@@ -33,6 +37,16 @@ def main():
     time = int(raw_input('How many animated timesteps do you want to run the CA for (warning: very slow)? '))
 
     #Animate CA over specified number of timesteps
-    viewer.animate(time)
+    viewer.animate(1)
+
+def animateCA(filename):
+    """Start from a configuratio stored in the specified file, and animate that configuration"""
+    """Used for results gathering. Every 5000 timesteps, I save a CA grid into a file, and this method lets me open those files and animate the grids to get screenshots and data"""
+    rules = FileOps.readRules('StateTransitionRules.txt')
+    ev = Eveloop.Eveloop()
+    ev.setRules(rules)
+    FileOps.readEveloop(filename, ev)
+    viewer = EVAnimate.EViewer(ev)
+    viewer.animate(1)
 
 main()

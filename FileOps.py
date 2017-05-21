@@ -44,3 +44,32 @@ def readRules(filename):
 
     #Return list of rules
     return rules
+
+
+def writeEveloop(fileName, ev):
+    """Writes an eveloop CA grid to a text file, so it can be read in later and animated"""
+    fout = open(fileName, 'w')
+    grid = ev.curGrid
+    for y in range(len(grid)):
+        for x in range(len(grid[y])):
+            fout.write(str(grid[y][x]) + ',')
+        fout.write('\n')
+
+def readEveloop(fileName, ev):
+    """Reads an eveloop CA grid from a specified text file, and sets it as the current grid for a specified eveloop object"""
+    grid = [[0 for x in range(200)] for y in range(200)]
+    fin = open(fileName)
+    y = 0
+    for line in fin:
+        x = 0
+        tokens = line.split(',')
+        for token in tokens:
+            try:
+                token.strip()
+                state = int(token)
+                grid[y][x] = state
+                x = x+1
+            except ValueError:
+                pass
+        y = y+1
+    ev.setGrid(grid)

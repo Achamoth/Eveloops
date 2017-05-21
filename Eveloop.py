@@ -256,6 +256,10 @@ class Eveloop(object):
         """Return this CA's current grid"""
         return self.curGrid
 
+    def setGrid(self, newGrid):
+        """Sets this CA's current grid"""
+        self.curGrid = numpy.array(newGrid)
+
     def tick(self):
         """Move to the next timestep according to the state-transition rules of the CA"""
         #Copy the current grid into lastGrid
