@@ -23,10 +23,10 @@ def main():
     #Run CA for specified number of timesteps
     for j in range(10):
         for i in range(time):
-            print('Timestep: ' + str(i))
+            print(str(j+1) + ' - Timestep: ' + str(i+1))
             ev.tick()
         #Save Eveloop config to file
-        outName = 'Eveloop ' + str(species) + ' ' + str(var) + ' ' + str(j) + '.txt'
+        outName = 'Eveloop ' + str(species) + ' ' + str(var) + ' ' + str(j+1) + '.txt'
         FileOps.writeEveloop(outName, ev)
 
     #Set up viewer for animation
