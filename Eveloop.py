@@ -1,62 +1,54 @@
 import copy
 import sys
+import numpy
 
 class Eveloop(object):
 
-    rules = []
-    lastGrid = [[0 for x in range(0)] for y in range(0)]
-    curGrid = [[0 for x in range(0)] for y in range(0)]
-
-
     def __init__(self, n=200, species=13, var=2):
         self.lastGrid = [[0 for x in range(n)] for y in range(n)]
+        self.lastGrid = numpy.array(self.lastGrid)
         self.curGrid = [[0 for x in range(n)] for y in range(n)]
+        self.curGrid = numpy.array(self.curGrid)
         messenger = self.setGridAndBox()
         self.setSpecies(species, var, messenger)
-
-    def printText(self):
-        for y in self.curGrid:
-            for x in y:
-                sys.stdout.write(str(x) + ' ')
-                sys.stdout.flush()
-            print('\n')
+        self.n = n
 
     def setSpecies(self, species, var, messenger):
         #Get location of messenger cell
         y, x = messenger
 
         #First, place the two green Gene cells
-        self.curGrid[y-1][x-1] = 4 #First green gene cell
-        self.curGrid[y-1][x-2] = 0 #Trailing background cell
-        self.curGrid[y-1][x-4] = 4 #Second green gene cell
-        self.curGrid[y-1][x-5] = 0 #Trailing background cell
+        self.curGrid[y+1][x-1] = 4 #First green gene cell
+        self.curGrid[y+1][x-2] = 0 #Trailing background cell
+        self.curGrid[y+1][x-4] = 4 #Second green gene cell
+        self.curGrid[y+1][x-5] = 0 #Trailing background cell
 
         #Next, place the leading white gene cells
         numLeading = var
-        y = y-2
+        y = y+2
         direction = 0 #0 is up, 1 is left, 2 is down
         for i in range(numLeading):
             #Place white gene cell and trailing background cell
             #Moving up
             if(direction == 0):
                 self.curGrid[y][x] = 0 #Trailing backgrund cell
-                if(self.curGrid[y-1][x] == 2):
+                if(self.curGrid[y+1][x] == 2):
                     direction = 1
                     x = x-1
                     self.curGrid[y][x] = 7 #White gene cell
                     x = x-2
                 else:
-                    y = y-1
+                    y = y+1
                     self.curGrid[y][x] = 7 #White gene cell
-                    if(self.curGrid[y-1][x] == 2):
+                    if(self.curGrid[y+1][x] == 2):
                         direction = 1
                         x = x-2
-                    elif(self.curGrid[y-2][x] == 2):
-                        y = y-1
+                    elif(self.curGrid[y+2][x] == 2):
+                        y = y+1
                         x = x-1
                         direction = 1
                     else:
-                        y = y-2
+                        y = y+2
 
             #Moving Left
             elif(direction == 1):
@@ -84,15 +76,15 @@ class Eveloop(object):
             #TODO: Don't need to do any checks here, as long as the species isn't larger than 13/14
             elif(direction == 2):
                 self.curGrid[y][x] = 0 #Trailing background cell
-                y = y+1
+                y = y-1
                 self.curGrid[y][x] = 7 #White gene cell
-                y = y+2
+                y = y-2
 
         #Finally, place the trailing white gene cells
         numTrailing = species - var
         y,x = messenger
         x= x-7
-        y = y-1
+        y = y+1
         direction = 0 #0 is left, 1 is up, 2 is right
         for i in range(numTrailing):
             #Place white gene cell and trailing background cell
@@ -101,43 +93,43 @@ class Eveloop(object):
             if(direction == 0):
                 self.curGrid[y][x] = 7 #White gene cell
                 if(self.curGrid[y][x-1] == 2):
-                    y = y-1
+                    y = y+1
                     self.curGrid[y][x] = 0 #Trailing background cell
-                    y = y-2
+                    y = y+2
                     direction = 1
                 else:
                     x = x-1
                     self.curGrid[y][x] = 0 #Trailing background cell
                     if(self.curGrid[y][x-1] == 2):
                         direction = 1
-                        y = y-2
+                        y = y+2
                     elif(self.curGrid[y][x-2] == 2):
                         direction = 1
                         x = x-1
-                        y = y-1
+                        y = y+1
                     else:
                         x = x-2
 
             #Moving up
             elif(direction == 1):
                 self.curGrid[y][x] = 7 #White gene cell
-                if(self.curGrid[y-1][x] == 2):
+                if(self.curGrid[y+1][x] == 2):
                     x = x+1
                     self.curGrid[y][x] = 0 #Trailing background cell
                     x = x+2
                     direction = 2
                 else:
-                    y = y-1
+                    y = y+1
                     self.curGrid[y][x] = 0 #Trailing background cell
-                    if(self.curGrid[y-1][x] == 2):
+                    if(self.curGrid[y+1][x] == 2):
                         direction = 2
                         x = x+2
-                    elif(self.curGrid[y-2][x] == 2):
+                    elif(self.curGrid[y+2][x] == 2):
                         direction = 2
-                        y = y-1
+                        y = y+1
                         x = x+1
                     else:
-                        y = y-2
+                        y = y+2
 
             #Moving right
             #TODO: Don't need to do any checks here, as long as species isn't larger than 13, and var is at least 2
@@ -157,33 +149,33 @@ class Eveloop(object):
         y = len(self.curGrid)/2
         x = len(self.curGrid[0])/2 #Bottom lefthand corner of inner sheath
 
-        #Create the sheath
+        #Create the inner sheath
         for i in range(13):
-            self.curGrid[y-i][x] = 2
-            self.curGrid[y-i][x+12] = 2
+            self.curGrid[y+i][x] = 2
+            self.curGrid[y+i][x+12] = 2
         for i in range(13):
             self.curGrid[y][x+i] = 2
-            self.curGrid[y-12][x+i] = 2
-        y = y+2
+            self.curGrid[y+12][x+i] = 2
+        y = y-2
         x = x-1 #Leftmost position on outer lower sheath
         for i in range(15):
             self.curGrid[y][x+i] = 2
-            self.curGrid[y-16][x+i] = 2
+            self.curGrid[y+16][x+i] = 2
         self.curGrid[y][x+14] = 5 #Create the messenger, to point where a new sprout should be generated
         messenger = (y, x+14)
-        y = y-1
+        y = y+1
         x = x-1 #Bottom of outer left sheath
         for i in range(15):
-            self.curGrid[y-i][x] = 2
-            self.curGrid[y-i][x+16] = 2
+            self.curGrid[y+i][x] = 2
+            self.curGrid[y+i][x+16] = 2
 
         #Finally, create the core cells, which fill the tube and conduct genes in it
         for i in range(15):
             self.curGrid[y][x+1+i] = 1
-            self.curGrid[y-14][x+1+i] = 1
+            self.curGrid[y+14][x+1+i] = 1
         for i in range(15):
-            self.curGrid[y-i][x+1] = 1
-            self.curGrid[y-i][x+15] = 1
+            self.curGrid[y+i][x+1] = 1
+            self.curGrid[y+i][x+15] = 1
 
         #Return the position of the messenger cell
         return messenger
@@ -242,6 +234,9 @@ class Eveloop(object):
                 else:
                     #1,2,...,7,8->8
                     return 8
+
+    def getGrid(self):
+        return self.curGrid
 
     def tick(self):
         self.lastGrid = copy.deepcopy(self.curGrid)
