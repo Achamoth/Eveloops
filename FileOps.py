@@ -26,7 +26,7 @@ def readRules(filename):
         for token in tokens:
 
             #Remove leading and trailing whitespace
-            token.strip()
+            token = token.strip()
             #Split current token around specified delimiter (separates CTRBL from I, since each token is a CTRBL->I value)
             states,image = token.split('->')
 
@@ -65,7 +65,7 @@ def readEveloop(fileName, ev):
         tokens = line.split(',')
         for token in tokens:
             try:
-                token.strip()
+                token = token.strip()
                 state = int(token)
                 grid[y][x] = state
                 x = x+1
