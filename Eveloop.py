@@ -259,12 +259,14 @@ class Eveloop(object):
     def setGrid(self, newGrid):
         """Sets this CA's current grid"""
         self.curGrid = numpy.array(newGrid)
+        #self.curGrid = copy.deepcopy(newGrid)
 
     def tick(self):
         """Move to the next timestep according to the state-transition rules of the CA"""
         #Copy the current grid into lastGrid
         self.lastGrid = numpy.empty_like (self.curGrid)
         self.lastGrid[:] = self.curGrid
+        #self.lastGrid = copy.deepcopy(self.curGrid)
         #Loop over all cells
         rows = len(self.lastGrid)
         columns = len(self.lastGrid[0])
